@@ -1,0 +1,18 @@
+Class Beacon {
+	UUID, RSSI, label
+}
+
+Let systemBeacons = array of Beacon objects representing physical beacons
+For all Beacon ∈ systemBeacons: set the RSSI value to -Double.MAX_VALUE
+
+OnBeaconsDetected {
+	For each detected beacon DetBeac:
+		If systemBeacons contains DetBeac:
+			Update RSSI value for the corresponding system beacon
+}
+
+Every N seconds {
+	Find the beacon with the largest RSSI value
+	Update the screen with the corresponding room label
+	For all Beacon ∈ systemBeacons: set the RSSI value to -Double.MAX_VALUE
+}

@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">BLERoomPos</string>
+    <string name="default_room_label_text">Room not found</string>
+</resources>
