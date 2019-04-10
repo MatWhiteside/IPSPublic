@@ -26,6 +26,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * 1 = Center
@@ -86,6 +88,9 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer {
 
         // Create hexagon by making 6 triangles using the Triangle class
         createHex();
+
+        // Update frontend and clear UI on a timer
+        update();
     }
 
     /**
@@ -148,7 +153,7 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer {
     /**
      * Set the whole hexagon to red. Set the triangle that contains the phone to green.
      */
-    public void updateFrontend() {
+    public void updateFrontend(ArrayList<String> esps) {
         // Set the whole hexagon to red
         topRightTriangle.setColor(Color.RED);
         middleRightTriangle.setColor(Color.RED);
@@ -156,9 +161,6 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer {
         bottomRightTriangle.setColor(Color.RED);
         middleLeftTriangle.setColor(Color.RED);
         topLeftTriangle.setColor(Color.RED);
-
-        // Get the three strongest readings from the ESPs
-        ArrayList<String> esps = getStrongestReadings();
 
         // Don't update anything if there weren't enough readings
         if(esps == null) return;
@@ -205,7 +207,7 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer {
                             !entry.getKey().equals(min1.getKey()) && !entry.getKey().equals(min2.getKey())) min3 = entry;
                 }
                 // If all three values were found, return the UUIDs of the three ESPs
-                if(min3 != null) {
+                if(min3 != null && min1.getValue() != Double.MAX_VALUE && min2.getValue() != Double.MAX_VALUE && min3.getValue() != Double.MAX_VALUE) {
                     String[] minArray = new String[]{min1.getKey(), min2.getKey(), min3.getKey()};
                     return new ArrayList<>(Arrays.asList(minArray));
                 }
@@ -262,7 +264,6 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer {
                         currentValues.put(b.getId1().toString(), b.getDistance());
                     }
                 }
-                updateFrontend();
             }
         });
 
@@ -270,6 +271,31 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer {
             beaconManager.startRangingBeaconsInRegion(new Region("matwh.rangingID", null, null, null));
         } catch (RemoteException e) {
             Log.e(TAG, "Beacon scan failed to start.");
+        }
+    }
+
+    /**
+     * Update the UI and reset distance values after doing so
+     */
+    private void update() {
+        // Repeat the task every 3 seconds
+        Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                updateFrontend(getStrongestReadings());
+                clearReadings();
+
+            }
+        },0,5000);
+    }
+
+    /**
+     * Reset all distance readings to Double.MAX_VALUE
+     */
+    private void clearReadings() {
+        for(Map.Entry<String, Double> entry : currentValues.entrySet()) {
+            entry.setValue(Double.MAX_VALUE);
         }
     }
 }
