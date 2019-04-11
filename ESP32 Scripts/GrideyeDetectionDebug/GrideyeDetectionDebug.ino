@@ -19,7 +19,7 @@ int originalSum;
 int currentSum;
 
 // Threshold constant used in detection formula (C)
-const int THRESHOLD = 100;
+const int THRESHOLD = 50;
 
 GridEYE grideye;
 
@@ -32,9 +32,10 @@ void setup() {
   
   // Take an initial measurement of the room which is the sum of all
   // pixel temperatures (average of 5 readings)
+  originalSum = 0;
   for(int i = 0; i < 5; i++) {
     int sum = 0;
-    for(unsigned char j = 0; j < 64; j++){
+    for(unsigned int j = 0; j < 64; j++){
       sum += grideye.getPixelTemperature(j);
     } 
     originalSum += sum;
@@ -48,7 +49,7 @@ void loop() {
   currentSum = 0;
   for(int i = 0; i < 5; i++) {
     int sum = 0;
-    for(unsigned char j = 0; j < 64; j++){
+    for(unsigned int j = 0; j < 64; j++){
       sum += grideye.getPixelTemperature(j);
     } 
     currentSum += sum;
