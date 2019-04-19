@@ -93,9 +93,6 @@ if __name__ == "__main__":
         # Use the DetectorAPI to find people in the frame
         boxes, scores, classes, num = odapi.processFrame(img)
 
-        #### Tester code for development ####
-        cv2.rectangle(img,(900, 400),(1100, 700),(255,0,0),2)
-
         # Fetch all human boxes
         human_boxes = [x for x, y, z in zip(boxes, classes, scores) if y == 1 and z > threshold]
 
